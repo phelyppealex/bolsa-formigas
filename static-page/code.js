@@ -27,8 +27,6 @@ function readImage(input) {
                         rgbMatrix[i][j] = [pixelData[index], pixelData[index + 1], pixelData[index + 2]]
                     }
                 }
-                console.log(rgbMatrix)
-
                 await processarImagem(rgbMatrix)
 
                 let requisicao = await fetch('http://localhost:8080/imagem/');
@@ -55,8 +53,15 @@ function readImage(input) {
 }
 
 async function processarImagem(img){
+    let metricInput = parseFloat(document.getElementById('metricInput').value)
+
+    if(isNaN(metricInput)){
+        metricInput = 6.8
+    }
+
     imageDict = {
         "imagem": img,
+        "metrica": metricInput
     }
 
     const url = 'http://localhost:8080/imagem/'
