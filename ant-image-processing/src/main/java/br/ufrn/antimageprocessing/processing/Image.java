@@ -1451,4 +1451,30 @@ public abstract class Image {
 
         return result;
     }
+
+    /**
+     * Transforma uma imagem lógica em RGB
+     * 
+     * @param im A imagem lógica.
+     * @return Retorna uma matriz inteira de 3 dimensões.
+     */
+    public static int[][][] bw2rgb(boolean[][] im){
+        var result = new int[im.length][im[0].length][3];
+
+        for(int i = 0; i < result.length; i++){
+            for(int j = 0; j < result[0].length; j++){
+                if (im[i][j]) {
+                    result[i][j][0] = 255;
+                    result[i][j][1] = 255;
+                    result[i][j][2] = 255;
+                }else{
+                    result[i][j][0] = 0;
+                    result[i][j][1] = 0;
+                    result[i][j][2] = 0;
+                }
+            }
+        }
+
+        return result;
+    }
 }
