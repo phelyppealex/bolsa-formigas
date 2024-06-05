@@ -32,12 +32,18 @@ function readImage(input) {
                 await processarImagem(rgbMatrix)
                 let resultado = await obterDados()
 
-                console.log(resultado)
-                
                 let descritores = resultado['descritores'].split('|')
                 
                 desenhar(resultado['mascara'], 'mascara')
                 desenhar(resultado['imagemFinal'], 'imagemFinal')
+
+                // Desenhando traço na imagem
+                ctx.strokeStyle = 'yellow'; // Cor do traço
+                ctx.lineWidth = 10; // Largura do traço
+                ctx.beginPath();
+                ctx.moveTo(resultado['indicesAltura'][1], resultado['indicesAltura'][0]); // Move para o ponto inicial
+                ctx.lineTo(resultado['indicesAltura'][3], resultado['indicesAltura'][2]); // Desenha uma linha até o ponto final
+                ctx.stroke(); // Desenha o traço
 
                 for(let d of descritores){
                     let lista = document.getElementById('listaDescritores')

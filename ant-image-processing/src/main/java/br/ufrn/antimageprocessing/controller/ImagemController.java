@@ -23,7 +23,6 @@ public class ImagemController {
     public Imagem getDescritores() {
         return im;
     }
-    
 
     @PostMapping
     public void processarImagem(@RequestBody Imagem imagem) {
@@ -40,26 +39,6 @@ public class ImagemController {
 
         // Convertendo a imagem para tons de cinza
         var imGray = Image.rgb2gray(imRGB);
-        
-        // /*
-        //  * Criando cópia da imagem em tons de cinza
-        //  * para fazer a limiarização
-        //  */
-        // var imLimiarizada = new int[imGray.length][imGray[0].length];
-        // for(int i = 0; i < imGray.length; i++)
-        //     for(int j = 0; j < imGray[0].length; j++)
-        //         imLimiarizada[i][j] = imGray[i][j];
-
-        // /*
-        //  * Fazendo a limiarização da imagem a partir
-        //  * de uma intensidade constante encontrada
-        //  */
-        // for(int i = 0; i < imLimiarizada.length; i++)
-        //     for(int j = 0; j < imLimiarizada[0].length; j++)
-        //         if(imLimiarizada[i][j] < limiar)
-        //             imLimiarizada[i][j] = 1;
-        //         else
-        //             imLimiarizada[i][j] = 0;
         
         /*
          * Aqui acontecem 3 processos.
@@ -78,14 +57,32 @@ public class ImagemController {
 
         imLogica = Image.bwClose(
             imLogica,
-            20
+            9
         );
 
         imLogica = Image.bwOpen(
             imLogica,
-            20
+            30
         );
 
+        // Gerando imagem final com tons de cinza
+        for(int i = 0; i < imGray.length; i++)
+            for(int j = 0; j < imGray[0].length; j++)
+                if(!imLogica[i][j])
+                    imGray[i][j] = 0;
+
+        var imLogicaErros = Image.logical(imGray);
+
+        for(int i = 0; i < imGray.length; i++)
+            for(int j = 0; j < imGray[0].length; j++)
+                if(imLogicaErros[i][j])
+                    imLogica[i][j] = false;
+        
+        imLogica = Image.bwClose(
+            imLogica,
+            9
+        );
+        
         im.setMascara(Image.bw2rgb(imLogica));
 
         /*
@@ -134,12 +131,6 @@ public class ImagemController {
         for(int i = 0; i < cabeca.length; i++)
             for(int j = 0; j < cabeca[0].length; j++)
                 cabeca[i][j] = imLogica[i][j+inicioCabeca];
-        
-        // Gerando imagem final com tons de cinza
-        // for(int i = 0; i < imGray.length; i++)
-        //     for(int j = 0; j < imGray[0].length; j++)
-        //         if(!imLogica[i][j])
-        //             imGray[i][j] = 0;
 
         // Gerando imagem final colorida
         for(int z = 0; z < 3; z++)
@@ -147,7 +138,7 @@ public class ImagemController {
                 for(int j = 0; j < imGray[0].length; j++)
                     if(!imLogica[i][j])
                         imRGB[i][j][z] = 0;
-        
+
         /*
          *  Identificando vértice da cabeça
          */
@@ -190,19 +181,9 @@ public class ImagemController {
             if (encontrou)
                 break;
         }
-        
-        // Pintando os pontos encontrados na imagem colorida
-        // for(int i = -5; i < 5; i++){
-        //     for(int j = -5; j < 5; j++){
-        //         imRGB[i+ultimoPixel[0]][j+ultimoPixel[1]][0] = 0;
-        //         imRGB[i+ultimoPixel[0]][j+ultimoPixel[1]][1] = 255;
-        //         imRGB[i+ultimoPixel[0]][j+ultimoPixel[1]][2] = 0;
 
-        //         imRGB[i+indiceVertice[0]][j+indiceVertice[1]][0] = 0;
-        //         imRGB[i+indiceVertice[0]][j+indiceVertice[1]][1] = 255;
-        //         imRGB[i+indiceVertice[0]][j+indiceVertice[1]][2] = 0;
-        //     }
-        // }
+        int[] indicesAltura = {indiceVertice[0], indiceVertice[1], ultimoPixel[0], ultimoPixel[1]};
+        im.setIndicesAltura(indicesAltura);
 
         /*
          * Resultados do processamento
