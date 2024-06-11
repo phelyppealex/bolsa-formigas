@@ -14,22 +14,23 @@ import br.ufrn.antimageprocessing.model.Imagem;
 import br.ufrn.antimageprocessing.processing.Image;
 
 @RestController
-@RequestMapping("/imagem/")
-public class ImagemController {
+@RequestMapping("/imagem-capsula/")
+public class ImagemCapsulaController {
 
     Imagem im;
 
-    @GetMapping()
+    @GetMapping
     public Imagem getDescritores() {
+        //System.out.println(im.getMetrica()+" "+im.getDescritores()+" "+im.getImagem()[2][3][0]);
         return im;
     }
 
     @PostMapping
-    public void processarImagem(@RequestBody Imagem imagem) {
+    public Imagem processarImagem(@RequestBody Imagem imagem){
         im = imagem;
 
         // Total de colunas da pilha e cabeça na imagem
-        int totalColunasPilha, totalColunasCabeca, limiar = 113;
+        int totalColunasPilha, totalColunasCabeca;
         // A variável métrica diz respeito ao tamanho da pilha em mm
         float
             metrica = (float) imagem.getMetrica(); //milímetros
@@ -37,15 +38,24 @@ public class ImagemController {
         // Lendo do banco de imagens
         var imRGB = imagem.getImagem();
 
-        // Convertendo a imagem para tons de cinza
+        // Convertendo a imagem pra Mat para utilizar a lib OpenCV
+        // Mat imCsv = imagem.convertToOpenCV(imRGB);
+
+        // double alpha = 1.5; // Fator de contraste
+        // double beta = 0; // Viés do brilho
+        // imCsv.convertTo(imCsv, -1, alpha, beta);
+
+        // imagem.convertToInt(imCsv);
+
+        //Convertendo a imagem para tons de cinza
         var imGray = Image.rgb2gray(imRGB);
         
         /*
-         * Aqui acontecem 3 processos.
-         * - Primeiro a imagem "imLimiarizada" é transformada em lógica
-         * - É feito uma dilatação
-         * - É feita uma erosão
-         */
+        * Aqui acontecem 3 processos.
+        * - Primeiro a imagem "imLimiarizada" é transformada em lógica
+        * - É feito uma dilatação
+        * - É feita uma erosão
+        */
 
         var imLogica = Image.logical(imGray);
 
@@ -65,12 +75,6 @@ public class ImagemController {
             30
         );
 
-        // Gerando imagem final com tons de cinza
-        for(int i = 0; i < imGray.length; i++)
-            for(int j = 0; j < imGray[0].length; j++)
-                if(!imLogica[i][j])
-                    imGray[i][j] = 0;
-
         var imLogicaErros = Image.logical(imGray);
 
         for(int i = 0; i < imGray.length; i++)
@@ -82,14 +86,25 @@ public class ImagemController {
             imLogica,
             9
         );
+
+        // Gerando imagem final com tons de cinza
+        for(int i = 0; i < imGray.length; i++)
+            for(int j = 0; j < imGray[0].length; j++)
+                if(!imLogica[i][j])
+                    imGray[i][j] = 0;
         
-        im.setMascara(Image.bw2rgb(imLogica));
+        // Gerando imagem final colorida
+        for(int i = 0; i < imGray.length; i++)
+            for(int j = 0; j < imGray[0].length; j++)
+                if(!imLogica[i][j])
+                    for(int z = 0; z < 3; z++)
+                        imRGB[i][j][z] = 0;
 
         /*
-         * Criando um vetor booleano do tamanho da largura
-         * da imagem para que vejamos quais colunas possuem
-         * pixels de foreground.
-         */
+        * Criando um vetor booleano do tamanho da largura
+        * da imagem para que vejamos quais colunas possuem
+        * pixels de foreground.
+        */
         var fgPixels = new boolean[imLogica[0].length];
         for(int i = 0; i < imLogica.length; i++)
             for(int j = 0; j < imLogica[0].length; j++)
@@ -132,16 +147,9 @@ public class ImagemController {
             for(int j = 0; j < cabeca[0].length; j++)
                 cabeca[i][j] = imLogica[i][j+inicioCabeca];
 
-        // Gerando imagem final colorida
-        for(int z = 0; z < 3; z++)
-            for(int i = 0; i < imGray.length; i++)
-                for(int j = 0; j < imGray[0].length; j++)
-                    if(!imLogica[i][j])
-                        imRGB[i][j][z] = 0;
-
         /*
-         *  Identificando vértice da cabeça
-         */
+        *  Identificando vértice da cabeça
+        */
         int regioesFrente = 0; // Verifica quantas regiões existem na linha em questão
         int[] indiceVertice = new int[2]; // Salva o índice do vértice
         boolean duasRegioes = false; // Verifica a primeira ocorência de duas regiões numa linha
@@ -166,8 +174,8 @@ public class ImagemController {
         }
 
         /*
-         * Fim da cabeça
-         */
+        * Fim da cabeça
+        */
         int[] ultimoPixel = {0,0};
         boolean encontrou = false;
         for(int i = cabeca.length-1; i >= 0; i--){
@@ -186,14 +194,14 @@ public class ImagemController {
         im.setIndicesAltura(indicesAltura);
 
         /*
-         * Resultados do processamento
-         */
+        * Resultados do processamento
+        */
 
         /*
-         * Aplicando a fórmula de pitágoras para
-         * descobrir a distância do vértice ao fim
-         * da mandíbula em pixels
-         */
+        * Aplicando a fórmula de pitágoras para
+        * descobrir a distância do vértice ao fim
+        * da mandíbula em pixels
+        */
         double
             cateto1 = Math.abs(indiceVertice[0] - ultimoPixel[0]),
             cateto2 = Math.abs(indiceVertice[1] - ultimoPixel[1]);
@@ -211,9 +219,13 @@ public class ImagemController {
         String alturaVerticeMandibulaStr = df.format(alturaVerticeMandibulaMm);
         String larguraCabecaStr = df.format(larguraCabecaMm);
 
+        im.setMascara(Image.bw2rgb(imLogica));
+
         im.setDescritores("Largura da cabeça: "+larguraCabecaStr+"mm");
         im.setDescritores(im.getDescritores() + "|Vértice ao fim da mandíbula: "+alturaVerticeMandibulaStr+"mm");
-
+        System.out.println("passou aq");
         im.setImagemFinal(imRGB);
+
+        return im;
     }
 }

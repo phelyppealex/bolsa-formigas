@@ -8,13 +8,28 @@ import lombok.Data;
 @Data
 public class Imagem {
     int[][][] imagem;
+    int[][][] imagemContrastada;
     int[][][] imagemFinal;
     int[][][] mascara;
     int[] indicesAltura;
     double metrica;
     String descritores;
 
-    public static Mat convertToOpenCV(int[][][] image) {
+    public Mat convertToOpenCV(int[][][] image){
+        var imagemLong = new long[image.length][image[0].length][3];
+
+        for(int i = 0; i < image.length; i++){
+            for(int j = 0; j < image[0].length; j++){
+                for(int x = 0; x < 3; x++){
+                    imagemLong[i][j][x] = image[i][j][x];
+                }
+            }
+        }
+
+        return convertToOpenCV(imagemLong);
+    }
+
+    public Mat convertToOpenCV(long[][][] image) {
         // Cria uma matriz Mat com as dimensões corretas e o tipo de dados correto
         Mat mat = new Mat(image.length, image[0].length, CvType.CV_8UC(image[0][0].length));
 
@@ -36,7 +51,7 @@ public class Imagem {
         return mat;
     }
 
-    public static Mat convertToOpenCV(int[][] image) {
+    public Mat convertToOpenCV(long[][] image) {
         // Cria uma matriz Mat com as dimensões corretas e o tipo de dados correto
         Mat mat = new Mat(image.length, image[0].length, CvType.CV_8UC(1));
 
@@ -51,5 +66,16 @@ public class Imagem {
         }
 
         return mat;
+    }
+
+    public void convertToInt(Mat mat){
+        for(int i = 0; i < imagem.length; i++){
+            for(int j = 0; j < imagem[0].length; j++){
+                for(int x = 0; x < 3; x++){
+                    this.imagemContrastada[i][j][x] = mat.put(i,j,x);
+                    //this.imagem[i][j][x] = mat.put(i,j,x);
+                }
+            }
+        }
     }
 }

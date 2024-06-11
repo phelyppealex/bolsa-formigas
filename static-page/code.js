@@ -1,3 +1,5 @@
+let url = ''
+
 function readImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -33,16 +35,23 @@ function readImage(input) {
                 let resultado = await obterDados()
 
                 let descritores = resultado['descritores'].split('|')
-                
-                desenhar(resultado['mascara'], 'mascara')
-                desenhar(resultado['imagemFinal'], 'imagemFinal')
+                console.log(resultado)
+                if(resultado['mascara'] != null){
+                    desenhar(resultado['mascara'], 'mascara')
+                }
+                if(resultado['imagemFinal'] != null){
+                    desenhar(resultado['imagemFinal'], 'imagemFinal')
+                }
+                if(resultado['imagemContrastada'] != null){
+                    desenhar(resultado['imagemContrastada'], 'imagemContrastada')
+                }
 
                 // Desenhando traço na imagem
                 ctx.strokeStyle = 'yellow'; // Cor do traço
                 ctx.lineWidth = 10; // Largura do traço
                 ctx.beginPath();
                 ctx.moveTo(resultado['indicesAltura'][1], resultado['indicesAltura'][0]); // Move para o ponto inicial
-                ctx.lineTo(resultado['indicesAltura'][3], resultado['indicesAltura'][2]); // Desenha uma linha até o ponto final
+                ctx.lineTo(resultado['indicesAltura'][3], resultado['indicesAltura'][2]); // Cria uma linha até o ponto final
                 ctx.stroke(); // Desenha o traço
 
                 for(let d of descritores){
@@ -66,17 +75,32 @@ function readImage(input) {
 
 async function processarImagem(img){
     let metricInput = parseFloat(document.getElementById('metricInput').value)
+    let imageTypeInput = document.getElementsByName('tipo_medicao')
+    let imageType = ''
+    
+    for(let radio of imageTypeInput){
+        if(radio.checked){
+            imageType = radio.value
+        }
+    }
 
+    // Caso uma nova métrica não seja definida pelo cliente, a padrão é posta automaticamente
     if(isNaN(metricInput)){
         metricInput = 6.8
     }
 
     imageDict = {
         "imagem": img,
-        "metrica": metricInput
+        "metrica": metricInput,
+        "tipoImagem": imageType
     }
 
-    const url = 'http://localhost:8080/imagem/'
+    if(imageType === 'cabeca'){
+        url = 'http://localhost:8080/imagem-capsula/'
+    }else{
+        url = 'http://localhost:8080/imagem-mandibula/'
+    }
+    
 
     let requisicao = await fetch(url, {
         method: 'POST',
@@ -92,7 +116,7 @@ async function processarImagem(img){
 }
 
 async function obterDados(){
-    let requisicao = await fetch('http://localhost:8080/imagem/');
+    let requisicao = await fetch(url);
     return await requisicao.json()
 }
 

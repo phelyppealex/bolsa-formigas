@@ -14,6 +14,15 @@
             <td><input id="metricInput" type="text"> a métrica padrão é 6.8</td>
         </tr>
         <tr>
+            <td><b>Tipo de medição:</b></td>
+            <td>
+                <input type="radio" name="tipo_medicao" id="cabeca" value="cabeca">
+                <label for="cabeca">Cabeça</label>
+                <input type="radio" name="tipo_medicao" id="mandibula" value="mandibula">
+                <label for="mandibula">Mandíbula</label>
+            </td>
+        </tr>
+        <tr>
             <td><b>Imagem:</b></td>
             <td><input type="file" id="fileInput" accept="image/*"></td>
         </tr>
@@ -22,6 +31,7 @@
     <canvas id="canvas"></canvas>
     <canvas id="mascara"></canvas>
     <canvas id="imagemFinal"></canvas>
+    <canvas id="imagemContrastada"></canvas>
 
     <div id="descritores">
         <ul id="listaDescritores">
