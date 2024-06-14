@@ -21,7 +21,6 @@ public class ImagemCapsulaController {
 
     @GetMapping
     public Imagem getDescritores() {
-        //System.out.println(im.getMetrica()+" "+im.getDescritores()+" "+im.getImagem()[2][3][0]);
         return im;
     }
 
@@ -190,9 +189,6 @@ public class ImagemCapsulaController {
                 break;
         }
 
-        int[] indicesAltura = {indiceVertice[0], indiceVertice[1], ultimoPixel[0], ultimoPixel[1]};
-        im.setIndicesAltura(indicesAltura);
-
         /*
         * Resultados do processamento
         */
@@ -213,6 +209,14 @@ public class ImagemCapsulaController {
         double alturaVerticeMandibulaMm = alturaVerticeMandibula * metrica / totalColunasPilha;
         double larguraCabecaMm = totalColunasCabeca * metrica / totalColunasPilha;
 
+        int[] indicesAltura = {indiceVertice[0], indiceVertice[1], ultimoPixel[0], ultimoPixel[1]};
+        int[] indicesLargura = {
+            indiceVertice[0],
+            inicioCabeca,
+            indiceVertice[0],
+            fimCabeca
+        };
+
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("pt", "BR"));
         DecimalFormat df = new DecimalFormat("#.##", symbols);
 
@@ -221,9 +225,12 @@ public class ImagemCapsulaController {
 
         im.setMascara(Image.bw2rgb(imLogica));
 
+        im.setIndicesAltura(indicesAltura);
+        im.setIndicesLargura(indicesLargura);
+
         im.setDescritores("Largura da cabeça: "+larguraCabecaStr+"mm");
         im.setDescritores(im.getDescritores() + "|Vértice ao fim da mandíbula: "+alturaVerticeMandibulaStr+"mm");
-        System.out.println("passou aq");
+        
         im.setImagemFinal(imRGB);
 
         return im;

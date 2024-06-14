@@ -12,6 +12,7 @@ public class Imagem {
     int[][][] imagemFinal;
     int[][][] mascara;
     int[] indicesAltura;
+    int[] indicesLargura;
     double metrica;
     String descritores;
 

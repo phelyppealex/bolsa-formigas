@@ -37,22 +37,28 @@ function readImage(input) {
                 let descritores = resultado['descritores'].split('|')
                 console.log(resultado)
                 if(resultado['mascara'] != null){
-                    desenhar(resultado['mascara'], 'mascara')
+                    desenharImagem(resultado['mascara'], 'mascara')
                 }
                 if(resultado['imagemFinal'] != null){
-                    desenhar(resultado['imagemFinal'], 'imagemFinal')
+                    desenharImagem(resultado['imagemFinal'], 'imagemFinal')
                 }
                 if(resultado['imagemContrastada'] != null){
-                    desenhar(resultado['imagemContrastada'], 'imagemContrastada')
+                    desenharImagem(resultado['imagemContrastada'], 'imagemContrastada')
+                }
+                if(resultado['indicesLargura'] != null){
+                    desenharTraco(resultado['indicesLargura'], 'cyan')
+                    
+                }
+                if(resultado['indicesAltura'] != null){
+                    desenharTraco(resultado['indicesAltura'], 'yellow')
                 }
 
-                // Desenhando traço na imagem
-                ctx.strokeStyle = 'yellow'; // Cor do traço
-                ctx.lineWidth = 10; // Largura do traço
-                ctx.beginPath();
-                ctx.moveTo(resultado['indicesAltura'][1], resultado['indicesAltura'][0]); // Move para o ponto inicial
-                ctx.lineTo(resultado['indicesAltura'][3], resultado['indicesAltura'][2]); // Cria uma linha até o ponto final
-                ctx.stroke(); // Desenha o traço
+                // ctx.strokeStyle = 'yellow'; // Cor do traço
+                // ctx.lineWidth = 13; // Largura do traço
+                // ctx.beginPath();
+                // ctx.moveTo(resultado['indicesAltura'][1], resultado['indicesAltura'][0]); // Move para o ponto inicial
+                // ctx.lineTo(resultado['indicesAltura'][3], resultado['indicesAltura'][2]); // Cria uma linha até o ponto final
+                // ctx.stroke(); // Desenha o traço na tela
 
                 for(let d of descritores){
                     let lista = document.getElementById('listaDescritores')
@@ -120,7 +126,7 @@ async function obterDados(){
     return await requisicao.json()
 }
 
-function desenhar(im, idCanvas){
+function desenharImagem(im, idCanvas){
     const canvas = document.getElementById(idCanvas);
     let ctx = canvas.getContext('2d', {willReadFrequently: true});
 
@@ -135,6 +141,16 @@ function desenhar(im, idCanvas){
             ctx.fillRect(j, i, 1, 1);   
         }
     }
+}
+
+function desenharTraco(indices, cor){
+    // Desenhando traço na imagem
+    ctx.strokeStyle = cor; // Cor do traço
+    ctx.lineWidth = 13; // Largura do traço
+    ctx.beginPath();
+    ctx.moveTo(indices[1], indices[0]); // Move para o ponto inicial
+    ctx.lineTo(indices[3], indices[2]); // Cria uma linha até o ponto final
+    ctx.stroke(); // Desenha o traço na tela
 }
 
 // Associando a função ao evento change do input file

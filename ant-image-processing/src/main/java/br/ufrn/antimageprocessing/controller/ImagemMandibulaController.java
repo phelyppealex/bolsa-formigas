@@ -45,6 +45,16 @@ public class ImagemMandibulaController {
             }
         }
 
+        imLogica = Image.bwClose(
+            imLogica,
+            15
+        );
+
+        imLogica = Image.bwOpen(
+            imLogica,
+            10
+        );
+
         // Gerando imagem final colorida
         for(int i = 0; i < imGray.length; i++)
             for(int j = 0; j < imGray[0].length; j++)
@@ -136,7 +146,21 @@ public class ImagemMandibulaController {
         totalLinhasMandibula = iPixelMaisBaixo - iPixelMaisAlto + 1;
 
         double alturaMandibulaMm = totalLinhasMandibula * imagem.getMetrica() / totalColunasPilha;
-        double larguraMandibulaMm = totalColunasMandibula * imagem.getMetrica() / totalColunasPilha;
+        double larguraMandibulaMm = totalColunasMandibula * imagem.getMetrica() / totalColunasPilha / 2;
+
+        int[] indicesAltura = {
+            iPixelMaisAlto,
+            (inicioMandibula + inicioMandibula + totalColunasMandibula) / 2,
+            iPixelMaisAlto + totalLinhasMandibula,
+            (inicioMandibula + inicioMandibula + totalColunasMandibula) / 2
+        };
+        
+        int[] indicesLargura = {
+            (iPixelMaisAlto + iPixelMaisBaixo) / 2,
+            inicioMandibula,
+            (iPixelMaisAlto + iPixelMaisBaixo) / 2,
+            inicioMandibula + totalColunasMandibula/2
+        };
 
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("pt", "BR"));
         DecimalFormat df = new DecimalFormat("#.##", symbols);
@@ -146,6 +170,9 @@ public class ImagemMandibulaController {
 
         im.setMascara(Image.bw2rgb(imLogica));
         im.setImagemFinal(imRGB);
+        
+        im.setIndicesAltura(indicesAltura);
+        im.setIndicesLargura(indicesLargura);
 
         im.setDescritores("Altura da mandíbula: "+alturaMandibulaStr+"mm");
         im.setDescritores(im.getDescritores() + "|Largura da mandíbula: "+larguraMandibulaStr+"mm");
