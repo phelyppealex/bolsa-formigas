@@ -1,5 +1,8 @@
 package br.ufrn.antimageprocessing.model;
 
+import java.util.List;
+
+import org.apache.commons.math3.stat.Frequency;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
@@ -77,6 +80,29 @@ public class Imagem {
                     //this.imagem[i][j][x] = mat.put(i,j,x);
                 }
             }
+        }
+    }
+
+    public int getModaHistograma(int[] hist){
+        Frequency freq = new Frequency();
+
+        for(int i: hist){
+            freq.addValue(i);
+        }
+
+        List<Comparable<?>> modas = freq.getMode();
+
+        if (!modas.isEmpty()) {
+            Comparable<?> modaComparable = modas.get(0);
+            if (modaComparable instanceof Long) {
+                return ((Long) modaComparable).intValue();
+            } else if (modaComparable instanceof Double) {
+                return ((Double) modaComparable).intValue();
+            } else {
+                throw new IllegalStateException("Tipo inesperado encontrado como moda: " + modaComparable.getClass());
+            }
+        } else {
+            throw new IllegalStateException("Nenhuma moda encontrada.");
         }
     }
 }

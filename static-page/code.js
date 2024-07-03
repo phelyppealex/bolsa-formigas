@@ -1,5 +1,5 @@
 let url = ''
-
+let ctx
 function readImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -9,7 +9,7 @@ function readImage(input) {
             
             img.onload = async function () {
                 const canvas = document.getElementById('canvas');
-                const ctx = canvas.getContext('2d', {willReadFrequently: true});
+                ctx = canvas.getContext('2d', {willReadFrequently: true});
                 canvas.width = img.width;
                 canvas.height = img.height;
                 ctx.drawImage(img, 0, 0);

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import org.opencv.core.Mat;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -29,7 +31,7 @@ public class ImagemCapsulaController {
         im = imagem;
 
         // Total de colunas da pilha e cabeça na imagem
-        int totalColunasPilha, totalColunasCabeca;
+        int totalColunasPilha, totalColunasCabeca, larguraIntensidade, iMenorIntensidade = -1, iMaiorIntensidade = -1, limiar;
         // A variável métrica diz respeito ao tamanho da pilha em mm
         float
             metrica = (float) imagem.getMetrica(); //milímetros
@@ -37,7 +39,7 @@ public class ImagemCapsulaController {
         // Lendo do banco de imagens
         var imRGB = imagem.getImagem();
 
-        // Convertendo a imagem pra Mat para utilizar a lib OpenCV
+        // // Convertendo a imagem pra Mat para utilizar a lib OpenCV
         // Mat imCsv = imagem.convertToOpenCV(imRGB);
 
         // double alpha = 1.5; // Fator de contraste
@@ -48,6 +50,67 @@ public class ImagemCapsulaController {
 
         //Convertendo a imagem para tons de cinza
         var imGray = Image.rgb2gray(imRGB);
+
+        // var imHist = Image.imHist(imGray);
+        // var novoHist1 = new int[256];
+        // var novoHist2 = new int[256];
+
+        // for(int i = 0; i < 256; i++){
+        //     novoHist1[i] = imHist[i];
+        //     novoHist2[i] = imHist[i];
+        // }
+
+        // for(int i = 1; i < imHist.length; i++)
+        //     if(novoHist1[i-1] > novoHist1[i])
+        //         novoHist1[i] = novoHist1[i-1];
+        
+        // for(int i = imHist.length-2; i >= 0; i--)
+        //     if(novoHist2[i+1] > novoHist2[i])
+        //         novoHist2[i] = novoHist2[i+1];
+
+        // int moda1 = imagem.getModaHistograma(novoHist1);
+        // int moda2 = imagem.getModaHistograma(novoHist2);
+
+        // String stringHist1 = "";
+        // String stringHist2 = "";
+
+        // for(int i = 0; i < imHist.length; i++){
+        //     stringHist1 += novoHist1[i];
+        //     if(i != imHist.length -1){
+        //         stringHist1 += ";";
+        //     }
+        // }
+
+        // for(int i = 0; i < imHist.length; i++){
+        //     stringHist2 += novoHist2[i];
+        //     if(i != imHist.length -1){
+        //         stringHist2 += ";";
+        //     }
+        // }
+
+        // for(int i = 0; i < imHist.length; i++){
+        //     if(imHist[i] > 0){
+        //         iMenorIntensidade = i;
+        //         break;
+        //     }
+        // }
+
+        // for(int i = imHist.length-1; i >= 0; i--){
+        //     if(imHist[i] > 0){
+        //         iMaiorIntensidade = i;
+        //         break;
+        //     }
+        // }
+        
+        // larguraIntensidade = iMaiorIntensidade - iMenorIntensidade + 1;
+        // limiar = larguraIntensidade * 21 / 100 + iMenorIntensidade;
+
+        // for(int i = 0; i < imGray.length; i++)
+        //     for(int j = 0; j < imGray[0].length; j++)
+        //         if(imGray[i][j] <= limiar)
+        //             imGray[i][j] = 0;
+        //         else
+        //             imGray[i][j] = 255;
         
         /*
         * Aqui acontecem 3 processos.
@@ -157,13 +220,15 @@ public class ImagemCapsulaController {
         for(int i = 0; i < cabeca.length; i++){
             regioesFrente = 0;
             for(int j = inicioCabeca; j < fimCabeca; j++){
-                if(imLogica[i][j] && !imLogica[i][j-1]){
-                    regioesFrente++;
-                    if(regioesFrente == 2){
-                        duasRegioes = true;
-
-                        indiceVertice[0] = i;
-                        indiceVertice[1] = j;
+                if(j - 1 >= 0){
+                    if(imLogica[i][j] && !imLogica[i][j-1]){
+                        regioesFrente++;
+                        if(regioesFrente == 2){
+                            duasRegioes = true;
+    
+                            indiceVertice[0] = i;
+                            indiceVertice[1] = j;
+                        }
                     }
                 }
             }
@@ -230,6 +295,10 @@ public class ImagemCapsulaController {
 
         im.setDescritores("Largura da cabeça: "+larguraCabecaStr+"mm");
         im.setDescritores(im.getDescritores() + "|Vértice ao fim da mandíbula: "+alturaVerticeMandibulaStr+"mm");
+        im.setDescritores(im.getDescritores() + "|Moda1: "+moda1);
+        im.setDescritores(im.getDescritores() + "|Moda2: "+moda2);
+        im.setDescritores(im.getDescritores() + "|"+stringHist1);
+        im.setDescritores(im.getDescritores() + "|"+stringHist2);
         
         im.setImagemFinal(imRGB);
 
