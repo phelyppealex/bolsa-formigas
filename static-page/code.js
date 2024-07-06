@@ -53,13 +53,6 @@ function readImage(input) {
                     desenharTraco(resultado['indicesAltura'], 'yellow')
                 }
 
-                // ctx.strokeStyle = 'yellow'; // Cor do traço
-                // ctx.lineWidth = 13; // Largura do traço
-                // ctx.beginPath();
-                // ctx.moveTo(resultado['indicesAltura'][1], resultado['indicesAltura'][0]); // Move para o ponto inicial
-                // ctx.lineTo(resultado['indicesAltura'][3], resultado['indicesAltura'][2]); // Cria uma linha até o ponto final
-                // ctx.stroke(); // Desenha o traço na tela
-
                 for(let d of descritores){
                     let lista = document.getElementById('listaDescritores')
                     let linha = document.createElement('li')
@@ -70,7 +63,6 @@ function readImage(input) {
                     texto.textContent = d
                 }
                 
-
                 console.log(descritores)
             }
             img.src = e.target.result;

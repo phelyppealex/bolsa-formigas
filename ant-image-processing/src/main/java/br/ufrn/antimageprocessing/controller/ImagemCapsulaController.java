@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import org.opencv.core.Mat;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -31,7 +29,7 @@ public class ImagemCapsulaController {
         im = imagem;
 
         // Total de colunas da pilha e cabeça na imagem
-        int totalColunasPilha, totalColunasCabeca, larguraIntensidade, iMenorIntensidade = -1, iMaiorIntensidade = -1, limiar;
+        int totalColunasPilha, totalColunasCabeca, larguraIntensidade, iMenorIntensidade = -1, iMaiorIntensidade = -1, limiar = 0, maiorVale;
         // A variável métrica diz respeito ao tamanho da pilha em mm
         float
             metrica = (float) imagem.getMetrica(); //milímetros
@@ -39,78 +37,79 @@ public class ImagemCapsulaController {
         // Lendo do banco de imagens
         var imRGB = imagem.getImagem();
 
-        // // Convertendo a imagem pra Mat para utilizar a lib OpenCV
-        // Mat imCsv = imagem.convertToOpenCV(imRGB);
-
-        // double alpha = 1.5; // Fator de contraste
-        // double beta = 0; // Viés do brilho
-        // imCsv.convertTo(imCsv, -1, alpha, beta);
-
-        // imagem.convertToInt(imCsv);
-
         //Convertendo a imagem para tons de cinza
         var imGray = Image.rgb2gray(imRGB);
 
-        // var imHist = Image.imHist(imGray);
-        // var novoHist1 = new int[256];
-        // var novoHist2 = new int[256];
+        // Criando histograma da imagem
+        var imHist = Image.imHist(imGray);
 
-        // for(int i = 0; i < 256; i++){
-        //     novoHist1[i] = imHist[i];
-        //     novoHist2[i] = imHist[i];
-        // }
+        // Criando cópias do histograma anterior para conseguir encontrar os picos
+        var novoHist1 = new int[256];
+        var novoHist2 = new int[256];
 
-        // for(int i = 1; i < imHist.length; i++)
-        //     if(novoHist1[i-1] > novoHist1[i])
-        //         novoHist1[i] = novoHist1[i-1];
+        // Preenchendo as cópias
+        for(int i = 0; i < 256; i++){
+            novoHist1[i] = imHist[i];
+            novoHist2[i] = imHist[i];
+        }
+
+        // Manipulando o histograma 1
+        for(int i = 1; i < imHist.length; i++)
+            if(novoHist1[i-1] > novoHist1[i])
+                novoHist1[i] = novoHist1[i-1];
         
-        // for(int i = imHist.length-2; i >= 0; i--)
-        //     if(novoHist2[i+1] > novoHist2[i])
-        //         novoHist2[i] = novoHist2[i+1];
+        // Manipulando o histograma 2
+        for(int i = imHist.length-2; i >= 0; i--)
+            if(novoHist2[i+1] > novoHist2[i])
+                novoHist2[i] = novoHist2[i+1];
 
-        // int moda1 = imagem.getModaHistograma(novoHist1);
-        // int moda2 = imagem.getModaHistograma(novoHist2);
+        // Pegando as modas de cada novo histograma que foi manipulado
+        int moda1 = imagem.getModaHistograma(novoHist1);
+        int moda2 = imagem.getModaHistograma(novoHist2);
 
-        // String stringHist1 = "";
-        // String stringHist2 = "";
+        // Obtendo o indice do primeiro pico
+        for(int i = 0; i < imHist.length; i++){
+            if(imHist[i] > 0){
+                iMenorIntensidade = i;
+                break;
+            }
+        }
+        System.out.println("Menor intensidade: "+iMenorIntensidade);
 
-        // for(int i = 0; i < imHist.length; i++){
-        //     stringHist1 += novoHist1[i];
-        //     if(i != imHist.length -1){
-        //         stringHist1 += ";";
-        //     }
-        // }
+        // Obtendo o indice do segundo pico
+        for(int i = imHist.length-1; i >= 0; i--){
+            if(imHist[i] > 0){
+                iMaiorIntensidade = i;
+                break;
+            }
+        }
+        System.out.println("Maior intensidade: "+iMaiorIntensidade);
 
-        // for(int i = 0; i < imHist.length; i++){
-        //     stringHist2 += novoHist2[i];
-        //     if(i != imHist.length -1){
-        //         stringHist2 += ";";
-        //     }
-        // }
+        maiorVale = imHist[iMenorIntensidade];
+        for(int i = iMenorIntensidade + 1; i <= iMaiorIntensidade; i++){
+            if(maiorVale > imHist[i]){
+                maiorVale = imHist[i];
+                limiar = i;
+                System.out.println("Limiar: "+limiar);
+            }
+        }
 
-        // for(int i = 0; i < imHist.length; i++){
-        //     if(imHist[i] > 0){
-        //         iMenorIntensidade = i;
-        //         break;
-        //     }
-        // }
+        String stringHist = "";
 
-        // for(int i = imHist.length-1; i >= 0; i--){
-        //     if(imHist[i] > 0){
-        //         iMaiorIntensidade = i;
-        //         break;
-        //     }
-        // }
-        
-        // larguraIntensidade = iMaiorIntensidade - iMenorIntensidade + 1;
-        // limiar = larguraIntensidade * 21 / 100 + iMenorIntensidade;
+        for(int i = 0; i < imHist.length; i++){
+            stringHist += imHist[i];
+            if(i != imHist.length -1){
+                stringHist += ";";
+            }
+        }
 
-        // for(int i = 0; i < imGray.length; i++)
-        //     for(int j = 0; j < imGray[0].length; j++)
-        //         if(imGray[i][j] <= limiar)
-        //             imGray[i][j] = 0;
-        //         else
-        //             imGray[i][j] = 255;
+        // Fazendo limiarização a partir do limiar encontrado
+        for(int i = 0; i < imGray.length; i++)
+            for(int j = 0; j < imGray[0].length; j++)
+                if(imGray[i][j] <= limiar)                                                           // EDITAR AQUI
+                    imGray[i][j] = 0;
+                else
+                    imGray[i][j] = 255;
         
         /*
         * Aqui acontecem 3 processos.
@@ -297,11 +296,21 @@ public class ImagemCapsulaController {
         im.setDescritores(im.getDescritores() + "|Vértice ao fim da mandíbula: "+alturaVerticeMandibulaStr+"mm");
         im.setDescritores(im.getDescritores() + "|Moda1: "+moda1);
         im.setDescritores(im.getDescritores() + "|Moda2: "+moda2);
-        im.setDescritores(im.getDescritores() + "|"+stringHist1);
-        im.setDescritores(im.getDescritores() + "|"+stringHist2);
+        im.setDescritores(im.getDescritores() + "|"+stringHist);
+        
         
         im.setImagemFinal(imRGB);
 
         return im;
     }
 }
+
+// // Convertendo a imagem pra Mat para utilizar a lib OpenCV
+// Mat imCsv = imagem.convertToOpenCV(imRGB);
+
+// double alpha = 1.5; // Fator de contraste
+// double beta = 0; // Viés do brilho
+// imCsv.convertTo(imCsv, -1, alpha, beta);
+
+// imagem.convertToInt(imCsv);
+
