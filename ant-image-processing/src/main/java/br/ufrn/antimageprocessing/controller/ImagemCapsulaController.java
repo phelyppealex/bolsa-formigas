@@ -69,28 +69,44 @@ public class ImagemCapsulaController {
 
         // Obtendo o indice do primeiro pico
         for(int i = 0; i < imHist.length; i++){
-            if(imHist[i] > 0){
+            if(imHist[i] == moda1){
                 iMenorIntensidade = i;
                 break;
             }
         }
-        System.out.println("Menor intensidade: "+iMenorIntensidade);
 
         // Obtendo o indice do segundo pico
         for(int i = imHist.length-1; i >= 0; i--){
-            if(imHist[i] > 0){
+            if(imHist[i] == moda2){
                 iMaiorIntensidade = i;
                 break;
             }
         }
-        System.out.println("Maior intensidade: "+iMaiorIntensidade);
+
+        if(moda1 == moda2){
+            int[] novoArray = new int[iMaiorIntensidade+1];
+            for(int i = 0; i < novoArray.length; i++){
+                novoArray[i] = novoHist1[i];
+            }
+            moda1 = imagem.getModaHistograma(novoArray);
+
+            // Corrigindo o indice do primeiro pico
+            for(int i = 0; i < imHist.length; i++){
+                if(imHist[i] == moda1){
+                    iMenorIntensidade = i;
+                    break;
+                }
+            }
+        }
+
+        System.out.println("Moda 1: ["+iMenorIntensidade+"] "+moda1);
+        System.out.println("Moda 2: ["+iMaiorIntensidade+"] "+moda2);
 
         maiorVale = imHist[iMenorIntensidade];
         for(int i = iMenorIntensidade + 1; i <= iMaiorIntensidade; i++){
             if(maiorVale > imHist[i]){
                 maiorVale = imHist[i];
-                limiar = i;
-                System.out.println("Limiar: "+limiar);
+                limiar = i;                                                           // OLHAR AQUI
             }
         }
 
