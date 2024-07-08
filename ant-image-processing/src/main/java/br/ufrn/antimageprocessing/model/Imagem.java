@@ -109,13 +109,59 @@ public class Imagem {
         }
     }
 
-    // public int[][] mapearRegiao(double[][] mascara, int linha, int coluna, int rotulo, int[][] matrizRotulos){
-    //     Queue<int[]> fila = new LinkedList<>();
+    public int[][] mapearRegiao(boolean[][] mascara, int linha, int coluna, int rotulo, int[][] matrizRotulos){
+        Queue<int[]> fila = new LinkedList<>();
 
-    //     int[] primeiroFila = {linha, coluna};
-
-    //     fila.offer(primeiroFila);
-
+        int[] primeiroFila = {linha, coluna};
         
-    // }
+        fila.offer(primeiroFila);
+        matrizRotulos[fila.peek()[0]][fila.peek()[1]] = rotulo;
+
+        while (!fila.isEmpty()){
+
+            int i = fila.peek()[0],
+                j = fila.peek()[1];
+
+            // Cima
+            if(linha > 0){
+                if(mascara[i -1][j] == true && matrizRotulos[i -1][j] == 0){
+                    int[] array = {i -1, j};
+                    matrizRotulos[array[0]][array[1]] = rotulo;
+                    fila.offer(array);
+                }
+            }
+
+            // Baixo
+            if (linha < mascara.length -1) {
+                if(mascara[i +1][j] == true && matrizRotulos[i +1][j] == 0){
+                    int[] array = {i +1, j};
+                    matrizRotulos[array[0]][array[1]] = rotulo;
+                    fila.offer(array);
+                }                
+            }
+            
+            // Esquerda
+            if(coluna > 0){
+                if(mascara[i][j -1] == true && matrizRotulos[i][j -1] == 0){
+                    int[] array = {i, j -1};
+                    matrizRotulos[array[0]][array[1]] = rotulo;
+                    fila.offer(array);
+                }
+            }
+            
+            // Direita
+            if (coluna < mascara[0].length -1){
+                if(mascara[i][j +1] == true && matrizRotulos[i][j +1] == 0){
+                    int[] array = {i, j +1};
+                    matrizRotulos[array[0]][array[1]] = rotulo;
+                    fila.offer(array);
+                }
+            }
+
+            fila.poll();
+        }
+        
+        int[][] nome = {{1, 1}, {1, 1}};
+        return nome;
+    }
 }
