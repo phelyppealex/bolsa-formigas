@@ -1,6 +1,8 @@
 package br.ufrn.antimageprocessing.model;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.apache.commons.math3.stat.Frequency;
 import org.opencv.core.CvType;
@@ -16,6 +18,7 @@ public class Imagem {
     int[][][] mascara;
     int[] indicesAltura;
     int[] indicesLargura;
+    int[] indicesMetrica;
     double metrica;
     String descritores;
 
@@ -105,4 +108,14 @@ public class Imagem {
             throw new IllegalStateException("Nenhuma moda encontrada.");
         }
     }
+
+    // public int[][] mapearRegiao(double[][] mascara, int linha, int coluna, int rotulo, int[][] matrizRotulos){
+    //     Queue<int[]> fila = new LinkedList<>();
+
+    //     int[] primeiroFila = {linha, coluna};
+
+    //     fila.offer(primeiroFila);
+
+        
+    // }
 }

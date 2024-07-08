@@ -52,6 +52,9 @@ function readImage(input) {
                 if(resultado['indicesAltura'] != null){
                     desenharTraco(resultado['indicesAltura'], 'yellow')
                 }
+                if(resultado['indicesMetrica'] != null){
+                    desenharTraco(resultado['indicesMetrica'], 'red')
+                }
 
                 for(let d of descritores){
                     let lista = document.getElementById('listaDescritores')

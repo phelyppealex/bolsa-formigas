@@ -106,7 +106,7 @@ public class ImagemCapsulaController {
         for(int i = iMenorIntensidade + 1; i <= iMaiorIntensidade; i++){
             if(maiorVale > imHist[i]){
                 maiorVale = imHist[i];
-                limiar = i;                                                           // OLHAR AQUI
+                limiar = i;
             }
         }
 
@@ -122,7 +122,7 @@ public class ImagemCapsulaController {
         // Fazendo limiarização a partir do limiar encontrado
         for(int i = 0; i < imGray.length; i++)
             for(int j = 0; j < imGray[0].length; j++)
-                if(imGray[i][j] <= limiar)                                                           // EDITAR AQUI
+                if(imGray[i][j] <= limiar)
                     imGray[i][j] = 0;
                 else
                     imGray[i][j] = 255;
@@ -144,7 +144,7 @@ public class ImagemCapsulaController {
 
         imLogica = Image.bwClose(
             imLogica,
-            9
+            10
         );
 
         imLogica = Image.bwOpen(
@@ -152,17 +152,17 @@ public class ImagemCapsulaController {
             30
         );
 
-        var imLogicaErros = Image.logical(imGray);
+        // var imLogicaErros = Image.logical(imGray);
 
-        for(int i = 0; i < imGray.length; i++)
-            for(int j = 0; j < imGray[0].length; j++)
-                if(imLogicaErros[i][j])
-                    imLogica[i][j] = false;
+        // for(int i = 0; i < imGray.length; i++)
+        //     for(int j = 0; j < imGray[0].length; j++)
+        //         if(imLogicaErros[i][j])
+        //             imLogica[i][j] = false;
         
-        imLogica = Image.bwClose(
-            imLogica,
-            9
-        );
+        // imLogica = Image.bwClose(
+        //     imLogica,
+        //     9
+        // );
 
         // Gerando imagem final com tons de cinza
         for(int i = 0; i < imGray.length; i++)
@@ -289,12 +289,24 @@ public class ImagemCapsulaController {
         double alturaVerticeMandibulaMm = alturaVerticeMandibula * metrica / totalColunasPilha;
         double larguraCabecaMm = totalColunasCabeca * metrica / totalColunasPilha;
 
-        int[] indicesAltura = {indiceVertice[0], indiceVertice[1], ultimoPixel[0], ultimoPixel[1]};
+        int[] indicesAltura = {
+            indiceVertice[0],
+            indiceVertice[1],
+            ultimoPixel[0],
+            ultimoPixel[1]
+        };
         int[] indicesLargura = {
             indiceVertice[0],
             inicioCabeca,
             indiceVertice[0],
             fimCabeca
+        };
+        int meioDaImagem = imGray.length / 2;
+        int[] indicesMetrica = {
+            meioDaImagem,
+            inicioPilha,
+            meioDaImagem,
+            fimPilha
         };
 
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("pt", "BR"));
@@ -307,11 +319,10 @@ public class ImagemCapsulaController {
 
         im.setIndicesAltura(indicesAltura);
         im.setIndicesLargura(indicesLargura);
+        im.setIndicesMetrica(indicesMetrica);
 
         im.setDescritores("Largura da cabeça: "+larguraCabecaStr+"mm");
         im.setDescritores(im.getDescritores() + "|Vértice ao fim da mandíbula: "+alturaVerticeMandibulaStr+"mm");
-        im.setDescritores(im.getDescritores() + "|Moda1: "+moda1);
-        im.setDescritores(im.getDescritores() + "|Moda2: "+moda2);
         im.setDescritores(im.getDescritores() + "|"+stringHist);
         
         
