@@ -152,17 +152,27 @@ public class ImagemCapsulaController {
             30
         );
 
-        // var imLogicaErros = Image.logical(imGray);
-
-        // for(int i = 0; i < imGray.length; i++)
-        //     for(int j = 0; j < imGray[0].length; j++)
-        //         if(imLogicaErros[i][j])
-        //             imLogica[i][j] = false;
+        //                                                                                       INICIO CONTAGEM DE REGIOES
+        int[][] matrizRotulos = new int[imLogica.length][imLogica[0].length];
         
-        // imLogica = Image.bwClose(
-        //     imLogica,
-        //     9
-        // );
+        for(int i = 0; i < imLogica.length; i++){
+            for(int j = 0; j < imLogica[0].length; j++){
+                matrizRotulos[i][j] = 0;
+            }
+        }
+
+        int rotulo = 0;
+
+        for(int i = 0; i < imLogica.length; i++){
+            for(int j = 0; j < imLogica[0].length; j++){
+                if(imLogica[i][j] && matrizRotulos[i][j] == 0){
+                    rotulo += 1;
+                    matrizRotulos = imagem.mapearRegiao(imLogica, i, j, rotulo, matrizRotulos);
+                }
+            }
+        }
+        System.out.println("Quantidade de regioes: "+ rotulo);
+        //                                                                                       FIM CONTAGEM DE REGIOES
 
         // Gerando imagem final com tons de cinza
         for(int i = 0; i < imGray.length; i++)
@@ -341,3 +351,17 @@ public class ImagemCapsulaController {
 
 // imagem.convertToInt(imCsv);
 
+
+
+
+// var imLogicaErros = Image.logical(imGray);
+
+// for(int i = 0; i < imGray.length; i++)
+//     for(int j = 0; j < imGray[0].length; j++)
+//         if(imLogicaErros[i][j])
+//             imLogica[i][j] = false;
+
+// imLogica = Image.bwClose(
+//     imLogica,
+//     9
+// );

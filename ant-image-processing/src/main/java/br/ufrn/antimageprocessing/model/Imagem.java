@@ -118,12 +118,11 @@ public class Imagem {
         matrizRotulos[fila.peek()[0]][fila.peek()[1]] = rotulo;
 
         while (!fila.isEmpty()){
-
             int i = fila.peek()[0],
                 j = fila.peek()[1];
 
             // Cima
-            if(linha > 0){
+            if(i > 0){
                 if(mascara[i -1][j] == true && matrizRotulos[i -1][j] == 0){
                     int[] array = {i -1, j};
                     matrizRotulos[array[0]][array[1]] = rotulo;
@@ -132,7 +131,7 @@ public class Imagem {
             }
 
             // Baixo
-            if (linha < mascara.length -1) {
+            if (i < mascara.length -1) {
                 if(mascara[i +1][j] == true && matrizRotulos[i +1][j] == 0){
                     int[] array = {i +1, j};
                     matrizRotulos[array[0]][array[1]] = rotulo;
@@ -141,7 +140,7 @@ public class Imagem {
             }
             
             // Esquerda
-            if(coluna > 0){
+            if(j > 0){
                 if(mascara[i][j -1] == true && matrizRotulos[i][j -1] == 0){
                     int[] array = {i, j -1};
                     matrizRotulos[array[0]][array[1]] = rotulo;
@@ -150,7 +149,7 @@ public class Imagem {
             }
             
             // Direita
-            if (coluna < mascara[0].length -1){
+            if (j < mascara[0].length -1){
                 if(mascara[i][j +1] == true && matrizRotulos[i][j +1] == 0){
                     int[] array = {i, j +1};
                     matrizRotulos[array[0]][array[1]] = rotulo;
@@ -161,7 +160,6 @@ public class Imagem {
             fila.poll();
         }
         
-        int[][] nome = {{1, 1}, {1, 1}};
-        return nome;
+        return matrizRotulos;
     }
 }
