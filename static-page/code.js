@@ -20,7 +20,6 @@ function readImage(input) {
 
                 // Matriz para armazenar os canais R, G e B
                 const rgbMatrix = [];
-                //canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
 
                 // Preenchendo as matrizes com os valores dos pixels
                 for (let i = 0; i < height; i++) {

@@ -29,7 +29,7 @@ public class ImagemCapsulaController {
         im = imagem;
 
         // Total de colunas da pilha e cabeça na imagem
-        int totalColunasPilha, totalColunasCabeca, larguraIntensidade, iMenorIntensidade = -1, iMaiorIntensidade = -1, limiar = 0, maiorVale;
+        int totalColunasPilha, totalColunasCabeca, iMenorIntensidade = -1, iMaiorIntensidade = -1, limiar = 0, maiorVale;
         // A variável métrica diz respeito ao tamanho da pilha em mm
         float
             metrica = (float) imagem.getMetrica(); //milímetros
@@ -39,6 +39,7 @@ public class ImagemCapsulaController {
 
         //Convertendo a imagem para tons de cinza
         var imGray = Image.rgb2gray(imRGB);
+        var imLogicaPilha = Image.logical(Image.rgb2gray(imRGB));
 
         // Criando histograma da imagem
         var imHist = Image.imHist(imGray);
@@ -110,14 +111,14 @@ public class ImagemCapsulaController {
             }
         }
 
-        String stringHist = "";
+        // String stringHist = "";
 
-        for(int i = 0; i < imHist.length; i++){
-            stringHist += imHist[i];
-            if(i != imHist.length -1){
-                stringHist += ";";
-            }
-        }
+        // for(int i = 0; i < imHist.length; i++){
+        //     stringHist += imHist[i];
+        //     if(i != imHist.length -1){
+        //         stringHist += ";";
+        //     }
+        // }
 
         // Fazendo limiarização a partir do limiar encontrado
         for(int i = 0; i < imGray.length; i++)
@@ -139,17 +140,25 @@ public class ImagemCapsulaController {
         for(int i = 0; i < imGray.length; i++){
             for(int j = 0; j < imGray[0].length; j++){
                 imLogica[i][j] = !imLogica[i][j];
+                imLogicaPilha[i][j] = !imLogicaPilha[i][j];
             }
         }
 
+        imLogicaPilha = Image.bwOpen(
+            imLogicaPilha,
+            20
+        );
+
+        im.setMascara(Image.bw2rgb(imLogicaPilha));
+
         imLogica = Image.bwClose(
             imLogica,
-            10
+            15
         );
 
         imLogica = Image.bwOpen(
             imLogica,
-            30
+            40
         );
 
         //                                                                                       INICIO CONTAGEM DE REGIOES
@@ -172,6 +181,48 @@ public class ImagemCapsulaController {
             }
         }
         System.out.println("Quantidade de regioes: "+ rotulo);
+
+        if(rotulo > 2){
+            int[] qntPixelPorRegiao = new int[rotulo];
+
+            for(int i = 0; i < qntPixelPorRegiao.length; i++)
+                qntPixelPorRegiao[i] = 0;
+
+            for(int i = 0; i < imLogica.length; i++){
+                for(int j = 0; j < imLogica[0].length; j++){
+                    if(matrizRotulos[i][j] != 0){
+                        qntPixelPorRegiao[matrizRotulos[i][j] -1] += 1;
+                    }
+                }
+            }
+
+            int primeiroObjeto = 0, rotuloPrimeiroObjeto = 0;
+            for(int i = 0; i < qntPixelPorRegiao.length; i++){
+                if(qntPixelPorRegiao[i] > primeiroObjeto){
+                    primeiroObjeto = qntPixelPorRegiao[i];
+                    rotuloPrimeiroObjeto = i + 1;
+                }
+            }
+
+            qntPixelPorRegiao[rotuloPrimeiroObjeto -1] = 0;
+
+            int segundoObjeto = 0, rotuloSegundoObjeto = 0;
+            for(int i = 0; i < qntPixelPorRegiao.length; i++){
+                if(qntPixelPorRegiao[i] > segundoObjeto){
+                    segundoObjeto = qntPixelPorRegiao[i];
+                    rotuloSegundoObjeto = i + 1;
+                }
+            }
+
+            for(int i = 0; i < imLogica.length; i++){
+                for(int j = 0; j < imLogica[0].length; j++){
+                    if(matrizRotulos[i][j] != rotuloPrimeiroObjeto && matrizRotulos[i][j] != rotuloSegundoObjeto){
+                        imLogica[i][j] = false;
+                    }
+                }
+            }
+        }
+
         //                                                                                       FIM CONTAGEM DE REGIOES
 
         // Gerando imagem final com tons de cinza
@@ -193,18 +244,23 @@ public class ImagemCapsulaController {
         * pixels de foreground.
         */
         var fgPixels = new boolean[imLogica[0].length];
-        for(int i = 0; i < imLogica.length; i++)
-            for(int j = 0; j < imLogica[0].length; j++)
+        var fgPixelsPilha = new boolean[imLogica[0].length];
+        for(int i = 0; i < imLogica.length; i++){
+            for(int j = 0; j < imLogica[0].length; j++){
                 if(imLogica[i][j] && !fgPixels[j])
                     fgPixels[j] = true;
+                if(imLogicaPilha[i][j] && !fgPixelsPilha[j])
+                    fgPixelsPilha[j] = true;
+            }
+        }
         
         // Guardando índices de início e de fim das colunas correspondentes a pilha
         int inicioPilha = -1, fimPilha = -1;
-        for(int i = fgPixels.length-1; i > 0; i--){
-            if(fgPixels[i]){
+        for(int i = fgPixelsPilha.length-1; i > 0; i--){
+            if(fgPixelsPilha[i]){
                 if(inicioPilha == -1)
                     inicioPilha = i;
-                if(fgPixels[i-1] == false){
+                if(fgPixelsPilha[i-1] == false){
                     fimPilha = i;
                     break;
                 }
@@ -215,7 +271,7 @@ public class ImagemCapsulaController {
         
         // Guardando índices de início e de fim das colunas correspondentes a cabeça
         int inicioCabeca = -1, fimCabeca = -1;
-        for(int i = 0; i < fgPixels.length - 1; i++){
+        for(int i = 0; i < fgPixels.length - 2; i++){
             if(fgPixels[i]){
                 if(inicioCabeca == -1)
                     inicioCabeca = i;
@@ -325,7 +381,7 @@ public class ImagemCapsulaController {
         String alturaVerticeMandibulaStr = df.format(alturaVerticeMandibulaMm);
         String larguraCabecaStr = df.format(larguraCabecaMm);
 
-        im.setMascara(Image.bw2rgb(imLogica));
+        //im.setMascara(Image.bw2rgb(imLogica));
 
         im.setIndicesAltura(indicesAltura);
         im.setIndicesLargura(indicesLargura);
@@ -333,7 +389,7 @@ public class ImagemCapsulaController {
 
         im.setDescritores("Largura da cabeça: "+larguraCabecaStr+"mm");
         im.setDescritores(im.getDescritores() + "|Vértice ao fim da mandíbula: "+alturaVerticeMandibulaStr+"mm");
-        im.setDescritores(im.getDescritores() + "|"+stringHist);
+        //im.setDescritores(im.getDescritores() + "|"+stringHist);
         
         
         im.setImagemFinal(imRGB);
@@ -350,7 +406,6 @@ public class ImagemCapsulaController {
 // imCsv.convertTo(imCsv, -1, alpha, beta);
 
 // imagem.convertToInt(imCsv);
-
 
 
 
