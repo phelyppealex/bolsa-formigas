@@ -6,3 +6,34 @@
 canvas{
     height: 300px;
 }
+nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4em;
+    background-color: white;
+    box-shadow: 0 0 10px black;
+}
+nav label{
+    margin-left: 5%;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+nav img{
+    height: 90%;
+    margin-right: 5%;
+}
+#tabela-formulario{
+    margin-top: 5em;
+    font-size: 1em;
+}
+#mascara{
+    display: none;
+}
+#imagemFinal{
+    display: none;
+}

@@ -8,10 +8,15 @@
 </head>
 
 <body>
-    <table>
+    <nav>
+        <label>PicAntMeasure</label>
+        <img src="dipas.png" alt="">
+    </nav>
+
+    <table id="tabela-formulario">
         <tr>
             <td><b>Métrica (mm):</b></td>
-            <td><input id="metricInput" type="text"> a métrica padrão é 6.8</td>
+            <td><input id="metricInput" type="text" size="1"> a métrica padrão é 6.8</td>
         </tr>
         <tr>
             <td><b>Tipo de medição:</b></td>
@@ -31,7 +36,6 @@
     <canvas id="canvas"></canvas>
     <canvas id="mascara"></canvas>
     <canvas id="imagemFinal"></canvas>
-    <canvas id="imagemContrastada"></canvas>
 
     <div id="descritores">
         <ul id="listaDescritores">

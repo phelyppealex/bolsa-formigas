@@ -13,7 +13,6 @@ import lombok.Data;
 @Data
 public class Imagem {
     int[][][] imagem;
-    int[][][] imagemContrastada;
     int[][][] imagemFinal;
     int[][][] mascara;
     int[] indicesAltura;
@@ -79,8 +78,7 @@ public class Imagem {
         for(int i = 0; i < imagem.length; i++){
             for(int j = 0; j < imagem[0].length; j++){
                 for(int x = 0; x < 3; x++){
-                    this.imagemContrastada[i][j][x] = mat.put(i,j,x);
-                    //this.imagem[i][j][x] = mat.put(i,j,x);
+                    this.imagem[i][j][x] = mat.put(i,j,x);
                 }
             }
         }
