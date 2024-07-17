@@ -162,10 +162,18 @@ public class ImagemCapsulaController {
             }
         }
 
+        im.setMascara(Image.bw2rgb(imLogica));
+
         /*
          * Erodindo e dilatando imagem para remoção de ruído
          * na máscara de identificação da pilha.
          */
+        // Dilatação e erosão para atenuação dos brilhos existentes na imagem
+        imLogicaPilha = Image.bwClose(
+            imLogicaPilha,
+            15
+        );
+
         imLogicaPilha = Image.bwOpen(
             imLogicaPilha,
             20
