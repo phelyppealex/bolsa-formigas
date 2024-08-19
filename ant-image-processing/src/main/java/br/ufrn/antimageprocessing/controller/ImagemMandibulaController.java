@@ -162,6 +162,14 @@ public class ImagemMandibulaController {
             inicioMandibula + totalColunasMandibula/2
         };
 
+        int meioDaImagem = imGray.length / 2;
+        int[] indicesMetrica = {
+            meioDaImagem,
+            inicioPilha,
+            meioDaImagem,
+            fimPilha
+        };
+
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("pt", "BR"));
         DecimalFormat df = new DecimalFormat("#.##", symbols);
 
@@ -173,6 +181,7 @@ public class ImagemMandibulaController {
         
         im.setIndicesAltura(indicesAltura);
         im.setIndicesLargura(indicesLargura);
+        im.setIndicesMetrica(indicesMetrica);
 
         im.setDescritores("Altura da mandíbula: "+alturaMandibulaStr+"mm");
         im.setDescritores(im.getDescritores() + "|Largura da mandíbula: "+larguraMandibulaStr+"mm");

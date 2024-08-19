@@ -1,5 +1,9 @@
+const porta = 4368
+const serverUrl = 'localhost'
 let url = ''
 let ctx
+let avancado = false
+
 function readImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -32,9 +36,13 @@ function readImage(input) {
                 
                 await processarImagem(rgbMatrix)
                 let resultado = await obterDados()
+                
+                if(resultado != null && resultado != undefined){
+                    console.log('Processamento finalizado com sucesso!')
+                }
 
                 let descritores = resultado['descritores'].split('|')
-                console.log(resultado)
+                
                 if(resultado['mascara'] != null){
                     desenharImagem(resultado['mascara'], 'mascara')
                 }
@@ -64,8 +72,6 @@ function readImage(input) {
                     linha.appendChild(texto)
                     texto.textContent = d
                 }
-                
-                console.log(descritores)
             }
             img.src = e.target.result;
         }
@@ -96,9 +102,9 @@ async function processarImagem(img){
     }
 
     if(imageType === 'cabeca'){
-        url = 'http://localhost:8080/imagem-capsula/'
+        url = `http://${serverUrl}:${porta}/imagem-capsula/`
     }else{
-        url = 'http://localhost:8080/imagem-mandibula/'
+        url = `http://${serverUrl}:${porta}/imagem-mandibula/`
     }
     
 
@@ -109,6 +115,9 @@ async function processarImagem(img){
         },
         body: JSON.stringify(imageDict)
     }).then( (response) => {
+        if(response.ok){
+            console.log('Requisição feita com sucesso...')
+        }
         if(!response.ok){
             throw new Error('Erro ao processar imagem')
         }
@@ -149,5 +158,25 @@ function desenharTraco(indices, cor){
 
 // Associando a função ao evento change do input file
 document.getElementById('fileInput').addEventListener('change', function () {
+    limparTela();
     readImage(this);
 });
+
+function limparTela(){
+    let parent = document.getElementById('listaDescritores')
+    
+    while(parent.firstChild){
+        parent.removeChild(parent.firstChild)
+    }
+}
+
+function configAvancada(){
+    if(avancado){
+        document.getElementById('mascara').style.display = 'none'
+        document.getElementById('imagemFinal').style.display = 'none'
+    }else{
+        document.getElementById('mascara').style.display = 'block'
+        document.getElementById('imagemFinal').style.display = 'block'
+    }
+    avancado = !avancado
+}

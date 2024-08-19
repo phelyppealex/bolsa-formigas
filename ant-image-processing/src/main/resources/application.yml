@@ -1,0 +1,5 @@
+spring:
+    application:
+        name: 'ant-image-processing'
+server:
+    port: 4368

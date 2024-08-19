@@ -118,7 +118,7 @@ public class ImagemCapsulaController {
         // Inicializando o maior vale com a intensidade do primeiro pico
         maiorVale = imHist[iMenorIntensidade];
 
-        // Encontrando o menor vale e definindo o limiar da máscara principal
+        // Encontrando o maior vale e definindo o limiar da máscara principal
         for(int i = iMenorIntensidade + 1; i <= iMaiorIntensidade; i++){
             if(maiorVale > imHist[i]){
                 maiorVale = imHist[i];
@@ -162,8 +162,6 @@ public class ImagemCapsulaController {
             }
         }
 
-        im.setMascara(Image.bw2rgb(imLogica));
-
         /*
          * Erodindo e dilatando imagem para remoção de ruído
          * na máscara de identificação da pilha.
@@ -176,7 +174,7 @@ public class ImagemCapsulaController {
 
         imLogicaPilha = Image.bwOpen(
             imLogicaPilha,
-            20
+            25
         );
 
         /*
@@ -423,12 +421,14 @@ public class ImagemCapsulaController {
             ultimoPixel[0],
             ultimoPixel[1]
         };
+
         int[] indicesLargura = {
-            indiceVertice[0],
+            (indiceVertice[0] + ultimoPixel[0])/2,
             inicioCabeca,
-            indiceVertice[0],
+            (indiceVertice[0] + ultimoPixel[0])/2,
             fimCabeca
         };
+
         int meioDaImagem = imGray.length / 2;
         int[] indicesMetrica = {
             meioDaImagem,
