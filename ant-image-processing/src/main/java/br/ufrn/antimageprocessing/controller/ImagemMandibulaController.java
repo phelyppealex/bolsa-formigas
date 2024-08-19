@@ -145,6 +145,15 @@ public class ImagemMandibulaController {
 
         totalLinhasMandibula = iPixelMaisBaixo - iPixelMaisAlto + 1;
 
+        int totalPixelsMandibula = 0;
+        for(int i = iPixelMaisAlto; i <= iPixelMaisBaixo; i++){
+            for(int j = inicioMandibula; j <= fimMandibula; j++){
+                if(imLogica[i][j]){
+                    totalPixelsMandibula++;
+                }
+            }
+        }
+
         double alturaMandibulaMm = totalLinhasMandibula * imagem.getMetrica() / totalColunasPilha;
         double larguraMandibulaMm = totalColunasMandibula * imagem.getMetrica() / totalColunasPilha / 2;
 
@@ -170,7 +179,7 @@ public class ImagemMandibulaController {
             fimPilha
         };
 
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("pt", "BR"));
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols( Locale.forLanguageTag("pt-BR") );
         DecimalFormat df = new DecimalFormat("#.##", symbols);
 
         String alturaMandibulaStr = df.format(alturaMandibulaMm);

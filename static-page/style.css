@@ -3,8 +3,27 @@
 *{
     font-family: "Poppins";
 }
+#imagens{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
 canvas{
-    height: 300px;
+    height: 400px;
+    margin: 3px;
+}
+.obs{
+    font-size: 0.8em;
+}
+h5{
+    margin: 0;
+}
+h2{
+    margin: 0;
+    margin-bottom: 30px;
+}
+hr{
+    margin: 20px 0;
 }
 nav{
     display: flex;

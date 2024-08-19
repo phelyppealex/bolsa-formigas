@@ -1,7 +1,15 @@
+// Constantes para uri de requisição
 const porta = 4368
-const serverUrl = 'localhost'
-let url = ''
+const serverIP = 'localhost'
+const serverAddress = `http://${serverIP}:${porta}`
+
+// Variável que receberá a uri para requisição
+let uri = ''
+
+// Contexto do objeto canvas HTML
 let ctx
+
+// Variável para identificar entado do botão de revelar imagens com informações mais avançadas na interface
 let avancado = false
 
 function readImage(input) {
@@ -12,15 +20,22 @@ function readImage(input) {
             const img = new Image();
             
             img.onload = async function () {
+                console.log("Desenhando imagem na tela")
+
                 const canvas = document.getElementById('canvas');
                 ctx = canvas.getContext('2d', {willReadFrequently: true});
                 canvas.width = img.width;
                 canvas.height = img.height;
                 ctx.drawImage(img, 0, 0);
+
+                console.log("Criando objeto da imagem")
+                
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const pixelData = imageData.data;
                 const width = canvas.width;
                 const height = canvas.height;
+
+
 
                 // Matriz para armazenar os canais R, G e B
                 const rgbMatrix = [];
@@ -33,12 +48,14 @@ function readImage(input) {
                         rgbMatrix[i][j] = [pixelData[index], pixelData[index + 1], pixelData[index + 2]]
                     }
                 }
+
+                console.log("Enviado para o servidor")
                 
                 await processarImagem(rgbMatrix)
                 let resultado = await obterDados()
-                
+
                 if(resultado != null && resultado != undefined){
-                    console.log('Processamento finalizado com sucesso!')
+                    console.log('Imprimindo dados na tela')
                 }
 
                 let descritores = resultado['descritores'].split('|')
@@ -98,17 +115,16 @@ async function processarImagem(img){
     imageDict = {
         "imagem": img,
         "metrica": metricInput,
-        "tipoImagem": imageType
     }
 
     if(imageType === 'cabeca'){
-        url = `http://${serverUrl}:${porta}/imagem-capsula/`
+        uri = `${serverAddress}/imagem-capsula/`
     }else{
-        url = `http://${serverUrl}:${porta}/imagem-mandibula/`
+        uri = `${serverAddress}/imagem-mandibula/`
     }
     
 
-    let requisicao = await fetch(url, {
+    let requisicao = await fetch(uri, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -116,16 +132,17 @@ async function processarImagem(img){
         body: JSON.stringify(imageDict)
     }).then( (response) => {
         if(response.ok){
-            console.log('Requisição feita com sucesso...')
+            console.log('Processamento finalizado')
         }
         if(!response.ok){
+            console.log(response)
             throw new Error('Erro ao processar imagem')
         }
     })
 }
 
 async function obterDados(){
-    let requisicao = await fetch(url);
+    let requisicao = await fetch(uri);
     return await requisicao.json()
 }
 
@@ -158,8 +175,9 @@ function desenharTraco(indices, cor){
 
 // Associando a função ao evento change do input file
 document.getElementById('fileInput').addEventListener('change', function () {
-    limparTela();
-    readImage(this);
+    limparTela()
+    console.clear()
+    readImage(this)
 });
 
 function limparTela(){

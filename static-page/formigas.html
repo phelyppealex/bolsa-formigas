@@ -15,6 +15,11 @@
 
     <table id="tabela-formulario">
         <tr>
+            <td colspan="2">
+                <h2><u>Formulário de envio</u></h2>
+            </td>
+        </tr>
+        <tr>
             <td><b>Métrica (mm):</b></td>
             <td><input id="metricInput" type="text" size="1"> a métrica padrão é 6.8</td>
         </tr>
@@ -33,14 +38,20 @@
         </tr>
         <tr>
             <td>
-                <button onclick="configAvancada()">Avançado</button>
+                <br>
+                <button onclick="configAvancada()">Mostrar Config Avançada</button><br>
+                <span class="obs">
+                    Obs.: mostra algumas imagens<br>
+                    que resultam do processo de<br>
+                    tratamento da imagem.
+                </span>
             </td>
         </tr>
     </table>
-    
-    <canvas id="canvas"></canvas>
-    <canvas id="mascara"></canvas><br>
-    <canvas id="imagemFinal"></canvas>
+
+    <hr>
+
+    <h2><u>Resultados</u></h2>
 
     <div id="descritores">
         <ul id="listaDescritores">
@@ -48,6 +59,13 @@
         </ul>
     </div>
     
+    <h5>Imagem final</h5><br>
+    <div id="imagens">
+        <canvas id="canvas"></canvas>
+        <canvas id="mascara"></canvas>
+        <canvas id="imagemFinal"></canvas>
+    </div>
+
     <link rel="stylesheet" href="style.css">
     <script src="code.js"></script>
 </body>

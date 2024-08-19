@@ -174,8 +174,9 @@ public class ImagemCapsulaController {
 
         imLogicaPilha = Image.bwOpen(
             imLogicaPilha,
-            25
+            40
         );
+
 
         /*
          * Fazendo identificação da largura da pilha na imagem
@@ -437,7 +438,7 @@ public class ImagemCapsulaController {
             fimPilha
         };
 
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("pt", "BR"));
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols( Locale.forLanguageTag("pt-BR") );
         DecimalFormat df = new DecimalFormat("#.##", symbols);
 
         String alturaVerticeMandibulaStr = df.format(alturaVerticeMandibulaMm);
